@@ -1,0 +1,53 @@
+# ===========================
+# JAVA / SPRING BOOT
+# ===========================
+backend/target/
+backend/.mvn/
+backend/*.jar
+backend/*.war
+backend/.classpath
+backend/.project
+backend/.settings/
+backend/HELP.md
+
+# ===========================
+# REACT / NODE
+# ===========================
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# ===========================
+# PYTHON / FLASK
+# ===========================
+ai-module/__pycache__/
+ai-module/*.pyc
+ai-module/venv/
+ai-module/.env
+ai-module/*.pkl
+
+# ===========================
+# DATABASE
+# ===========================
+*.sql.bak
+*.db
+
+# ===========================
+# VS CODE
+# ===========================
+.vscode/
+*.code-workspace
+
+# ===========================
+# ENVIRONMENT FILES
+# ===========================
+.env
+.env.local
+.env.production
+
+# ===========================
+# OS FILES
+# ===========================
+.DS_Store
+Thumbs.db
