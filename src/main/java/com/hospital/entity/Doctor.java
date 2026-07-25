@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "patients")
+@Table(name = "doctors")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Patient {
+public class Doctor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,16 +29,17 @@ public class Patient {
 
     private String phone;
 
-    private LocalDate dateOfBirth;
+    @NotBlank(message = "Specialization is required")
+    private String specialization;
 
-    private String gender;
+    private String qualification;
 
-    private String address;
+    private Integer experienceYears;
 
     @Column(nullable = false)
     private String password;
 
-    private String role = "PATIENT";
+    private String role = "DOCTOR";
 
     private LocalDate registeredOn = LocalDate.now();
 }
