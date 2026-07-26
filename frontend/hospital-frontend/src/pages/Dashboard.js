@@ -91,11 +91,37 @@ function Dashboard() {
             </Link>
           </div>
           <div className='col-md-6 mb-3'>
-            <div className='card shadow p-4 text-center' style={{borderRadius: '15px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
-              <div style={{fontSize: '40px', marginBottom: '10px'}}>&#129302;</div>
-              <h5 className='fw-bold text-white'>AI Prediction</h5>
-              <p className='text-white mb-0' style={{opacity: 0.8}}>Smart priority and wait time prediction</p>
-            </div>
+            <Link to='/ai-prediction' className='text-decoration-none'>
+              <div className='card shadow p-4 text-center' style={{borderRadius: '15px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', cursor: 'pointer', transition: 'transform 0.2s'}}
+                onMouseEnter={e => e.currentTarget.style.transform='scale(1.02)'}
+                onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}>
+                <div style={{fontSize: '40px', marginBottom: '10px'}}>&#129302;</div>
+                <h5 className='fw-bold text-white'>AI Prediction</h5>
+                <p className='text-white mb-0' style={{opacity: 0.8}}>Smart priority and wait time prediction</p>
+              </div>
+            </Link>
+          </div>
+          <div className='col-md-6 mb-3'>
+            <Link to='/doctors' className='text-decoration-none'>
+              <div className='card shadow p-4 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s'}}
+                onMouseEnter={e => e.currentTarget.style.transform='scale(1.02)'}
+                onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}>
+                <div style={{fontSize: '40px', marginBottom: '10px'}}>&#128104;&#8205;&#9877;&#65039;</div>
+                <h5 className='fw-bold text-info'>Find a Doctor</h5>
+                <p className='text-muted mb-0'>Browse doctors and book an appointment</p>
+              </div>
+            </Link>
+          </div>
+          <div className='col-md-6 mb-3'>
+            <Link to='/my-appointments' className='text-decoration-none'>
+              <div className='card shadow p-4 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s'}}
+                onMouseEnter={e => e.currentTarget.style.transform='scale(1.02)'}
+                onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}>
+                <div style={{fontSize: '40px', marginBottom: '10px'}}>&#128197;</div>
+                <h5 className='fw-bold text-primary'>My Appointments</h5>
+                <p className='text-muted mb-0'>View and manage your booked appointments</p>
+              </div>
+            </Link>
           </div>
         </div>
         {hospitals.length > 0 && (

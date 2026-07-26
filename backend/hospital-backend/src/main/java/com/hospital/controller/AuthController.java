@@ -1,14 +1,17 @@
 package com.hospital.controller;
 
 import com.hospital.config.JwtUtil;
+import com.hospital.entity.Admin;
+import com.hospital.entity.Doctor;
 import com.hospital.entity.Patient;
+import com.hospital.repository.AdminRepository;
+import com.hospital.repository.DoctorRepository;
 import com.hospital.repository.PatientRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,25 +19,20 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired
-    private PatientRepository patientRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtUtil jwtUtil;
+    @Autowired private PatientRepository patientRepository;
+    @Autowired private DoctorRepository doctorRepository;
+    @Autowired private AdminRepository adminRepository;
+    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private JwtUtil jwtUtil;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody Patient patient) {
         if (patientRepository.existsByEmail(patient.getEmail())) {
             return ResponseEntity.badRequest().body("Email already registered");
         }
-
         patient.setPassword(passwordEncoder.encode(patient.getPassword()));
         patient.setRole("PATIENT");
         patientRepository.save(patient);
-
         return ResponseEntity.ok("Patient registered successfully");
     }
 
@@ -44,19 +42,31 @@ public class AuthController {
         String password = loginRequest.get("password");
 
         Patient patient = patientRepository.findByEmail(email).orElse(null);
-
-        if (patient == null || !passwordEncoder.matches(password, patient.getPassword())) {
-            return ResponseEntity.status(401).body("Invalid email or password");
+        if (patient != null && passwordEncoder.matches(password, patient.getPassword())) {
+            return buildResponse(patient.getId(), patient.getName(), patient.getEmail(), "PATIENT");
         }
 
-        String token = jwtUtil.generateToken(patient.getEmail(), patient.getRole());
+        Doctor doctor = doctorRepository.findByEmail(email).orElse(null);
+        if (doctor != null && passwordEncoder.matches(password, doctor.getPassword())) {
+            return buildResponse(doctor.getId(), doctor.getName(), doctor.getEmail(), "DOCTOR");
+        }
 
-        Map<String, String> response = new HashMap<>();
+        Admin admin = adminRepository.findByEmail(email).orElse(null);
+        if (admin != null && passwordEncoder.matches(password, admin.getPassword())) {
+            return buildResponse(admin.getId(), admin.getName(), admin.getEmail(), "ADMIN");
+        }
+
+        return ResponseEntity.status(401).body("Invalid email or password");
+    }
+
+    private ResponseEntity<?> buildResponse(Long id, String name, String email, String role) {
+        String token = jwtUtil.generateToken(email, role);
+        Map<String, Object> response = new HashMap<>();
         response.put("token", token);
-        response.put("name", patient.getName());
-        response.put("email", patient.getEmail());
-        response.put("role", patient.getRole());
-
+        response.put("id", id);
+        response.put("name", name);
+        response.put("email", email);
+        response.put("role", role);
         return ResponseEntity.ok(response);
     }
 }

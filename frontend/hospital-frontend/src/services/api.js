@@ -53,4 +53,18 @@ export const queueService = {
   cancel: (queueId) => api.put('/queue/' + queueId + '/cancel'),
 };
 
+export const doctorService = {
+  getAll: () => api.get('/doctors'),
+  getById: (id) => api.get('/doctors/' + id),
+};
+
+export const appointmentService = {
+  book: (patientId, doctorId, data) =>
+    api.post('/appointments?patientId=' + patientId + '&doctorId=' + doctorId, data),
+  getPatientAppointments: (patientId) => api.get('/appointments/patient/' + patientId),
+  getDoctorAppointments: (doctorId) => api.get('/appointments/doctor/' + doctorId),
+  updateStatus: (id, status) => api.put('/appointments/' + id + '/status?status=' + status),
+  cancel: (id) => api.delete('/appointments/' + id),
+};
+
 export default api;

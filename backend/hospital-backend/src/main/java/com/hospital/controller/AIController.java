@@ -1,28 +1,41 @@
 package com.hospital.controller;
 
-import com.hospital.service.AIService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/ai")
-@RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class AIController {
 
-    private final AIService aiService;
+    private final RestTemplate restTemplate = new RestTemplate();
+    private static final String FLASK_BASE_URL = "http://127.0.0.1:5000";
 
     @PostMapping("/predict/priority")
-    public ResponseEntity<Map<String, Object>> predictPriority(@RequestBody Map<String, Object> patientData) {
-        return ResponseEntity.ok(aiService.predictPriority(patientData));
-    }
+    public ResponseEntity<?> predictPriority(@RequestBody Map<String, Object> vitals) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
 
-    @PostMapping("/predict/waittime")
-    public ResponseEntity<Map<String, Object>> predictWaitTime(@RequestBody Map<String, Object> data) {
-        int queueCount = (int) data.getOrDefault("queueCount", 0);
-        int priorityCode = (int) data.getOrDefault("priorityCode", 1);
-        return ResponseEntity.ok(aiService.predictWaitTime(queueCount, priorityCode));
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(vitals, headers);
+
+            ResponseEntity<Map> response = restTemplate.postForEntity(
+                    FLASK_BASE_URL + "/predict/priority",
+                    request,
+                    Map.class
+            );
+
+            return ResponseEntity.ok(response.getBody());
+        } catch (Exception e) {
+            return ResponseEntity.status(503).body(Map.of(
+                    "error", "AI service unavailable",
+                    "details", e.getMessage()
+            ));
+        }
     }
 }
