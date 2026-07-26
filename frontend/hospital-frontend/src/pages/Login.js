@@ -17,7 +17,10 @@ function Login() {
       const response = await authService.login({ email, password });
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data));
-      navigate('/dashboard');
+      const role = response.data.role;
+      if (role === 'ADMIN') navigate('/admin');
+      else if (role === 'DOCTOR') navigate('/doctor-dashboard');
+      else navigate('/dashboard');
     } catch (err) {
       setError('Invalid email or password');
     } finally {
@@ -29,7 +32,7 @@ function Login() {
     <div className='container-fluid min-vh-100 d-flex align-items-center justify-content-center' style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
       <div className='card shadow-lg p-4' style={{width: '400px', borderRadius: '15px'}}>
         <div className='text-center mb-4'>
-          <h2 className='text-primary fw-bold'>?? Hospital Queue</h2>
+          <h2 className='text-primary fw-bold'>Hospital Queue System</h2>
           <p className='text-muted'>Sign in to your account</p>
         </div>
         {error && <div className='alert alert-danger'>{error}</div>}
@@ -48,6 +51,9 @@ function Login() {
         </form>
         <div className='text-center mt-3'>
           <p>Don't have an account? <Link to='/register'>Register here</Link></p>
+        </div>
+        <div className='text-center mt-2'>
+          <small className='text-muted'>Admin login: admin@hospital.com / password</small>
         </div>
       </div>
     </div>
