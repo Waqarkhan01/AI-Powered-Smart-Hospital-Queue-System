@@ -1,4 +1,4 @@
-# ?? AI-Powered Smart Hospital Bed Queue Management System
+# AI-Powered Smart Hospital Bed Queue Management System
 
 > Final Year Project | B.Tech CSE (Artificial Intelligence)
 
@@ -6,22 +6,22 @@ A production-ready, full-stack AI-integrated Hospital Management System that int
 
 ---
 
-## ?? Key Features
+## Key Features
 
-- ?? JWT Authentication with Role-Based Access (Patient / Doctor / Admin)
-- ?? Hospital & Bed Management with real-time availability
-- ?? Smart Queue Management with AI-based Priority Assignment
-- ?? AI Patient Priority Prediction — Random Forest (94% accuracy)
-- ?? Estimated Wait Time Prediction using ML
-- ?? Appointment Booking, Confirmation & Cancellation
-- ????? Doctor Dashboard — manage appointments, confirm/cancel
-- ??? Admin Dashboard — manage hospitals, beds, queue, doctors
-- ?? Real-time Toast Notifications
-- ?? Fully Responsive UI with Bootstrap 5
+- JWT Authentication with Role-Based Access (Patient / Doctor / Admin)
+- Hospital and Bed Management with real-time availability
+- Smart Queue Management with AI-based Priority Assignment
+- AI Patient Priority Prediction using Random Forest (94% accuracy)
+- Estimated Wait Time Prediction using ML
+- Appointment Booking, Confirmation and Cancellation
+- Doctor Dashboard to manage appointments
+- Admin Dashboard to manage hospitals, beds, queue, doctors
+- Real-time Toast Notifications
+- Fully Responsive UI with Bootstrap 5
 
 ---
 
-## ??? Tech Stack
+## Tech Stack
 
 | Layer | Technology | Version |
 |---|---|---|
@@ -33,68 +33,57 @@ A production-ready, full-stack AI-integrated Hospital Management System that int
 
 ---
 
-## ?? Project Structure
+## Project Structure
 
-\\\
-AI-Powered-Smart-Hospital-Queue-System/
-+-- backend/                    # Spring Boot REST API
-¦   +-- hospital-backend/
-¦       +-- controller/         # REST Controllers
-¦       +-- service/            # Business Logic
-¦       +-- repository/         # JPA Repositories
-¦       +-- entity/             # Database Entities
-¦       +-- config/             # JWT & Security Config
-+-- frontend/                   # React.js UI
-¦   +-- hospital-frontend/
-¦       +-- src/
-¦           +-- pages/          # All UI Pages
-¦           +-- services/       # Axios API Services
-+-- ai-module/                  # Python Flask AI Service
-¦   +-- app.py                  # Flask API
-¦   +-- generate_dataset.py     # Synthetic Data Generator
-¦   +-- priority_model.pkl      # Trained ML Model
-+-- docs/                       # Documentation
-\\\
+    AI-Powered-Smart-Hospital-Queue-System/
+    |-- backend/                    Spring Boot REST API
+    |   |-- controller/             REST Controllers
+    |   |-- service/                Business Logic
+    |   |-- repository/             JPA Repositories
+    |   |-- entity/                 Database Entities
+    |   |-- config/                 JWT and Security Config
+    |-- frontend/                   React.js UI
+    |   |-- pages/                  All UI Pages
+    |   |-- services/               Axios API Services
+    |-- ai-module/                  Python Flask AI Service
+    |   |-- app.py                  Flask API
+    |   |-- generate_dataset.py     Dataset Generator
+    |   |-- priority_model.pkl      Trained ML Model
+    |-- docs/                       Documentation
 
 ---
 
-## ?? How to Run
+## How to Run
 
-### 1. Backend (Spring Boot)
-\\\ash
-cd backend/hospital-backend
-./mvnw spring-boot:run
-# Runs on http://localhost:8080
-\\\
+### 1. Backend
+    cd backend/hospital-backend
+    mvnw spring-boot:run
+    Runs on http://localhost:8080
 
-### 2. AI Module (Flask)
-\\\ash
-cd ai-module
-python app.py
-# Runs on http://localhost:5000
-\\\
+### 2. AI Module
+    cd ai-module
+    python app.py
+    Runs on http://localhost:5000
 
-### 3. Frontend (React)
-\\\ash
-cd frontend/hospital-frontend
-npm install
-npm start
-# Runs on http://localhost:3000
-\\\
+### 3. Frontend
+    cd frontend/hospital-frontend
+    npm install
+    npm start
+    Runs on http://localhost:3000
 
 ---
 
-## ?? Default Login Credentials
+## Default Login Credentials
 
 | Role | Email | Password |
 |---|---|---|
-| ?? Patient | test@example.com | test1234 |
-| ??? Admin | admin@hospital.com | password |
-| ????? Doctor | ramesh@hospital.com | password |
+| Patient | test@example.com | test1234 |
+| Admin | admin@hospital.com | password |
+| Doctor | ramesh@hospital.com | password |
 
 ---
 
-## ?? AI Model Details
+## AI Model Details
 
 | Model | Algorithm | Accuracy | Purpose |
 |---|---|---|---|
@@ -102,22 +91,22 @@ npm start
 | Wait Time Estimator | Rule-based ML | - | Estimates waiting time in minutes |
 | Hospital Recommender | Scoring Algorithm | - | Ranks hospitals by suitability |
 
-**Input Features:** Age, Gender, Temperature, SpO2, Heart Rate, Blood Pressure, Disease Type, Emergency Flag
+Input Features: Age, Gender, Temperature, SpO2, Heart Rate, Blood Pressure, Disease Type, Emergency Flag
 
 ---
 
-## ?? Team Members
+## Team Members
 
-| # | Name | Role | Contribution |
+| No | Name | Role | Contribution |
 |---|---|---|---|
-| 1 | **Mohammad Waqar Khan** *(Team Lead)* | AI/ML Engineer | Random Forest model, Flask API, AI integration, Project architecture |
-| 2 | **Gavrang Kol** | Database Architect | MySQL schema design, ER diagram, JPA entities, SQL optimization |
-| 3 | **Chaitanya Arora** | Backend Developer | Spring Boot APIs, JWT auth, Security config, REST endpoints |
-| 4 | **Prince Raj** | Frontend Developer | React UI, Bootstrap design, Axios integration, Role-based routing |
+| 1 | Mohammad Waqar Khan (Team Lead) | AI/ML Engineer | Random Forest model, Flask API, AI integration, Project architecture |
+| 2 | Gavrang Kol | Database Architect | MySQL schema design, ER diagram, JPA entities, SQL optimization |
+| 3 | Chaitanya Arora | Backend Developer | Spring Boot APIs, JWT auth, Security config, REST endpoints |
+| 4 | Prince Raj | Frontend Developer | React UI, Bootstrap design, Axios integration, Role-based routing |
 
 ---
 
-## ?? API Endpoints
+## API Endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -132,20 +121,4 @@ npm start
 
 ---
 
-## ?? Screenshots
-
-### Patient Dashboard
-- Search Hospitals, AI Priority Prediction, Queue Status, Find Doctors
-
-### Admin Dashboard  
-- Manage Hospitals, View Patient Queue, Admit Patients, Manage Doctors
-
-### Doctor Dashboard
-- View Appointments, Confirm/Cancel/Complete Appointments
-
-### AI Prediction Page
-- Fill patient vitals ? Get CRITICAL/HIGH/MEDIUM/LOW priority with confidence %
-
----
-
-*Built with ?? by Team — B.Tech CSE AI | Final Year Project 2026*
+Built with dedication by Team - B.Tech CSE AI | Final Year Project 2026
