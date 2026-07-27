@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { hospitalService, queueService, doctorService, appointmentService } from '../services/api';
+import { hospitalService, queueService, doctorService, appointmentService, admissionService } from '../services/api';
 
 function AdminDashboard() {
   const [hospitals, setHospitals] = useState([]);
   const [selectedHospital, setSelectedHospital] = useState(null);
   const [queue, setQueue] = useState([]);
+  const [admissions, setAdmissions] = useState([]);
 
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
@@ -18,15 +19,31 @@ function AdminDashboard() {
     doctorService.getAll().then(res => setDoctors(res.data)).catch(console.error);
   }, []);
 
+  const loadHospitalData = (hospital) => {
+    queueService.getHospitalQueue(hospital.id).then(res => setQueue(res.data)).catch(console.error);
+    admissionService.getHospitalAdmissions(hospital.id)
+      .then(res => setAdmissions(res.data.filter(a => a.status === 'ADMITTED')))
+      .catch(console.error);
+  };
+
   const handleSelectHospital = (hospital) => {
     setSelectedHospital(hospital);
-    queueService.getHospitalQueue(hospital.id).then(res => setQueue(res.data)).catch(console.error);
+    loadHospitalData(hospital);
   };
 
   const handleAdmit = (queueId) => {
     queueService.admit(queueId)
-      .then(() => setQueue(queue.filter(q => q.id !== queueId)))
-      .catch(() => alert('Failed to admit patient'));
+      .then(() => {
+        setQueue(queue.filter(q => q.id !== queueId));
+        loadHospitalData(selectedHospital);
+      })
+      .catch((err) => alert(err.response?.data || 'Failed to admit patient'));
+  };
+
+  const handleRelease = (admissionId) => {
+    admissionService.release(admissionId)
+      .then(() => setAdmissions(admissions.filter(a => a.id !== admissionId)))
+      .catch(() => alert('Failed to release patient'));
   };
 
   const handleSelectDoctor = (doctor) => {
@@ -92,6 +109,24 @@ function AdminDashboard() {
                           <span className='badge bg-success'>{q.status}</span>
                         </div>
                         <button className='btn btn-success btn-sm' onClick={() => handleAdmit(q.id)}>Admit</button>
+                      </div>
+                    </div>
+                  ))
+                )}
+
+                <h5 className='fw-bold mb-3 mt-4'>Current Admissions</h5>
+                {admissions.length === 0 ? (
+                  <div className='alert alert-info'>No patients currently admitted</div>
+                ) : (
+                  admissions.map(a => (
+                    <div key={a.id} className='card shadow mb-3 p-3' style={{borderRadius: '10px'}}>
+                      <div className='d-flex justify-content-between align-items-center'>
+                        <div>
+                          <h6 className='fw-bold'>{a.patient?.name}</h6>
+                          <p className='mb-1 text-muted'>Bed: {a.bed?.bedNumber || 'N/A'}</p>
+                          <p className='mb-0 text-muted small'>Admitted: {new Date(a.admittedOn).toLocaleString()}</p>
+                        </div>
+                        <button className='btn btn-outline-danger btn-sm' onClick={() => handleRelease(a.id)}>Release</button>
                       </div>
                     </div>
                   ))

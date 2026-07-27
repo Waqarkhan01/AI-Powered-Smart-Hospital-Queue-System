@@ -7,8 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -27,6 +26,7 @@ public class AdminController {
         }
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));
         admin.setRole("ADMIN");
+        admin.setRegisteredOn(LocalDate.now());
         adminRepository.save(admin);
         return ResponseEntity.ok("Admin registered successfully");
     }

@@ -4,12 +4,16 @@ const API_BASE_URL = 'http://localhost:8080/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: { 'Content-Type': 'application/json' },
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  if (token) config.headers.Authorization = 'Bearer ' + token;
+  if (token) {
+    config.headers.Authorization = 'Bearer ' + token;
+  }
   return config;
 });
 
@@ -55,18 +59,18 @@ export const doctorService = {
 };
 
 export const appointmentService = {
-  book: (patientId, doctorId, data) => api.post('/appointments?patientId=' + patientId + '&doctorId=' + doctorId, data),
+  book: (patientId, doctorId, data) =>
+    api.post('/appointments?patientId=' + patientId + '&doctorId=' + doctorId, data),
   getPatientAppointments: (patientId) => api.get('/appointments/patient/' + patientId),
   getDoctorAppointments: (doctorId) => api.get('/appointments/doctor/' + doctorId),
-  getAll: () => api.get('/appointments'),
   updateStatus: (id, status) => api.put('/appointments/' + id + '/status?status=' + status),
-  cancel: (id) => api.put('/appointments/' + id + '/cancel'),
+  cancel: (id) => api.delete('/appointments/' + id),
 };
 
 export const admissionService = {
-  getHospitalAdmissions: (hospitalId) => api.get('/admissions/hospital/' + hospitalId),
   getPatientAdmissions: (patientId) => api.get('/admissions/patient/' + patientId),
-  release: (admissionId) => api.put('/admissions/' + admissionId + '/release'),
+  getHospitalAdmissions: (hospitalId) => api.get('/admissions/hospital/' + hospitalId),
+  release: (id) => api.put('/admissions/' + id + '/release'),
 };
 
 export default api;

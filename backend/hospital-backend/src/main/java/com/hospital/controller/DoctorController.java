@@ -4,8 +4,10 @@ import com.hospital.entity.Doctor;
 import com.hospital.repository.DoctorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -14,6 +16,9 @@ public class DoctorController {
 
     @Autowired
     private DoctorRepository doctorRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping
     public List<Doctor> getAllDoctors() {
@@ -29,6 +34,9 @@ public class DoctorController {
 
     @PostMapping
     public Doctor createDoctor(@RequestBody Doctor doctor) {
+        doctor.setPassword(passwordEncoder.encode(doctor.getPassword()));
+        doctor.setRole("DOCTOR");
+        doctor.setRegisteredOn(LocalDate.now());
         return doctorRepository.save(doctor);
     }
 

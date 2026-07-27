@@ -1,19 +1,16 @@
 package com.hospital.controller;
 
-import com.hospital.entity.Doctor;
-import com.hospital.entity.Hospital;
-import com.hospital.entity.Patient;
-import com.hospital.entity.Queue;
+import com.hospital.entity.*;
 import com.hospital.entity.Queue.BedType;
 import com.hospital.entity.Queue.Priority;
 import com.hospital.entity.Queue.QueueStatus;
-import com.hospital.repository.HospitalRepository;
-import com.hospital.repository.PatientRepository;
-import com.hospital.repository.QueueRepository;
+import com.hospital.entity.Bed.BedStatus;
+import com.hospital.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -28,6 +25,12 @@ public class QueueController {
 
     @Autowired
     private HospitalRepository hospitalRepository;
+
+    @Autowired
+    private BedRepository bedRepository;
+
+    @Autowired
+    private AdmissionRepository admissionRepository;
 
     @PostMapping("/join")
     public ResponseEntity<?> joinQueue(@RequestParam Long patientId,
@@ -66,14 +69,40 @@ public class QueueController {
     }
 
     @PutMapping("/{queueId}/admit")
-    public ResponseEntity<Queue> admitPatient(@PathVariable Long queueId) {
-        return queueRepository.findById(queueId)
-                .map(entry -> {
-                    entry.setStatus(QueueStatus.ADMITTED);
-                    entry.setAdmittedAt(java.time.LocalDateTime.now());
-                    return ResponseEntity.ok(queueRepository.save(entry));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> admitPatient(@PathVariable Long queueId) {
+        Queue entry = queueRepository.findById(queueId).orElse(null);
+        if (entry == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<Bed> beds = bedRepository.findAll();
+        Bed availableBed = beds.stream()
+                .filter(b -> b.getHospital().getId().equals(entry.getHospital().getId()))
+                .filter(b -> b.getBedType().name().equals(entry.getBedType().name()))
+                .filter(b -> b.getStatus() == BedStatus.AVAILABLE)
+                .findFirst()
+                .orElse(null);
+
+        if (availableBed == null) {
+            return ResponseEntity.badRequest().body("No available bed of type " + entry.getBedType() + " at this hospital");
+        }
+
+        availableBed.setStatus(BedStatus.OCCUPIED);
+        bedRepository.save(availableBed);
+
+        Admission admission = new Admission();
+        admission.setPatient(entry.getPatient());
+        admission.setHospital(entry.getHospital());
+        admission.setBed(availableBed);
+        admission.setStatus("ADMITTED");
+        admission.setAdmittedOn(LocalDateTime.now());
+        admissionRepository.save(admission);
+
+        entry.setStatus(QueueStatus.ADMITTED);
+        entry.setAdmittedAt(LocalDateTime.now());
+        queueRepository.save(entry);
+
+        return ResponseEntity.ok(admission);
     }
 
     @DeleteMapping("/{id}")

@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -36,7 +35,6 @@ public class DoctorController {
     public Doctor createDoctor(@RequestBody Doctor doctor) {
         doctor.setPassword(passwordEncoder.encode(doctor.getPassword()));
         doctor.setRole("DOCTOR");
-        doctor.setRegisteredOn(LocalDate.now());
         return doctorRepository.save(doctor);
     }
 

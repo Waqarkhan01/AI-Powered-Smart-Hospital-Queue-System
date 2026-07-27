@@ -10,10 +10,21 @@ import AdminDashboard from './pages/AdminDashboard';
 import AIPrediction from './pages/AIPrediction';
 import DoctorsList from './pages/DoctorsList';
 import MyAppointments from './pages/MyAppointments';
+import DoctorDashboard from './pages/DoctorDashboard';
+import MyAdmissions from './pages/MyAdmissions';
 
-const PrivateRoute = ({ children }) => {
+const PrivateRoute = ({ children, allowedRoles }) => {
   const token = localStorage.getItem('token');
-  return token ? children : <Navigate to='/login' />;
+  if (!token) return <Navigate to='/login' />;
+
+  if (allowedRoles) {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (!allowedRoles.includes(user.role)) {
+      return <Navigate to='/login' />;
+    }
+  }
+
+  return children;
 };
 
 function App() {
@@ -22,13 +33,15 @@ function App() {
       <Routes>
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
-        <Route path='/dashboard' element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+        <Route path='/dashboard' element={<PrivateRoute allowedRoles={['PATIENT']}><Dashboard /></PrivateRoute>} />
         <Route path='/hospitals' element={<PrivateRoute><HospitalList /></PrivateRoute>} />
         <Route path='/queue' element={<PrivateRoute><QueueStatus /></PrivateRoute>} />
-        <Route path='/admin' element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
+        <Route path='/admin' element={<PrivateRoute allowedRoles={['ADMIN']}><AdminDashboard /></PrivateRoute>} />
+        <Route path='/doctor-dashboard' element={<PrivateRoute allowedRoles={['DOCTOR']}><DoctorDashboard /></PrivateRoute>} />
         <Route path='/ai-prediction' element={<PrivateRoute><AIPrediction /></PrivateRoute>} />
         <Route path='/doctors' element={<PrivateRoute><DoctorsList /></PrivateRoute>} />
         <Route path='/my-appointments' element={<PrivateRoute><MyAppointments /></PrivateRoute>} />
+        <Route path='/my-admissions' element={<PrivateRoute><MyAdmissions /></PrivateRoute>} />
         <Route path='/' element={<Navigate to='/login' />} />
       </Routes>
     </Router>
