@@ -12,6 +12,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AIPrediction from './pages/AIPrediction';
 import DoctorsList from './pages/DoctorsList';
 import MyAppointments from './pages/MyAppointments';
+import DoctorDashboard from './pages/DoctorDashboard';
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -32,6 +33,7 @@ function App() {
         <Route path='/ai-prediction' element={<PrivateRoute><AIPrediction /></PrivateRoute>} />
         <Route path='/doctors' element={<PrivateRoute><DoctorsList /></PrivateRoute>} />
         <Route path='/my-appointments' element={<PrivateRoute><MyAppointments /></PrivateRoute>} />
+        <Route path='/doctor-dashboard' element={<PrivateRoute><DoctorDashboard /></PrivateRoute>} />
         <Route path='/' element={<Navigate to='/login' />} />
       </Routes>
     </Router>
