@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Pie } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { hospitalService, queueService, doctorService, appointmentService, admissionService } from '../services/api';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 function AdminDashboard() {
   const [hospitals, setHospitals] = useState([]);
@@ -11,13 +15,37 @@ function AdminDashboard() {
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [appointments, setAppointments] = useState([]);
+  const [allAppointments, setAllAppointments] = useState([]);
+
+  const [showAddDoctor, setShowAddDoctor] = useState(false);
+  const [doctorForm, setDoctorForm] = useState({
+    name: '', email: '', phone: '', specialization: '', qualification: '', experienceYears: '', password: ''
+  });
+  const [addDoctorMsg, setAddDoctorMsg] = useState('');
 
   const navigate = useNavigate();
 
   useEffect(() => {
+    loadDoctors();
     hospitalService.getAll().then(res => setHospitals(res.data)).catch(console.error);
-    doctorService.getAll().then(res => setDoctors(res.data)).catch(console.error);
+    loadAllAppointmentsForChart();
   }, []);
+
+  const loadAllAppointmentsForChart = () => {
+    doctorService.getAll().then(res => {
+      const doctorList = res.data;
+      Promise.all(doctorList.map(d => appointmentService.getDoctorAppointments(d.id)))
+        .then(results => {
+          const combined = results.flatMap(r => r.data);
+          setAllAppointments(combined);
+        })
+        .catch(console.error);
+    }).catch(console.error);
+  };
+
+  const loadDoctors = () => {
+    doctorService.getAll().then(res => setDoctors(res.data)).catch(console.error);
+  };
 
   const loadHospitalData = (hospital) => {
     queueService.getHospitalQueue(hospital.id).then(res => setQueue(res.data)).catch(console.error);
@@ -53,8 +81,32 @@ function AdminDashboard() {
 
   const handleUpdateStatus = (id, status) => {
     appointmentService.updateStatus(id, status)
-      .then(() => setAppointments(appointments.map(a => a.id === id ? { ...a, status } : a)))
+      .then(() => {
+        setAppointments(appointments.map(a => a.id === id ? { ...a, status } : a));
+        loadAllAppointmentsForChart();
+      })
       .catch(() => alert('Failed to update appointment'));
+  };
+
+  const handleDoctorFormChange = (e) => {
+    setDoctorForm({ ...doctorForm, [e.target.name]: e.target.value });
+  };
+
+  const handleAddDoctor = async (e) => {
+    e.preventDefault();
+    setAddDoctorMsg('');
+    try {
+      await doctorService.register({
+        ...doctorForm,
+        experienceYears: parseInt(doctorForm.experienceYears) || 0
+      });
+      setAddDoctorMsg('Doctor added successfully!');
+      setDoctorForm({ name: '', email: '', phone: '', specialization: '', qualification: '', experienceYears: '', password: '' });
+      loadDoctors();
+      setTimeout(() => setShowAddDoctor(false), 1200);
+    } catch (err) {
+      setAddDoctorMsg('Failed to add doctor. Email may already be registered.');
+    }
   };
 
   const handleLogout = () => {
@@ -73,6 +125,19 @@ function AdminDashboard() {
     }
   };
 
+  const statusCounts = { PENDING: 0, CONFIRMED: 0, COMPLETED: 0, CANCELLED: 0 };
+  allAppointments.forEach(a => {
+    if (statusCounts[a.status] !== undefined) statusCounts[a.status]++;
+  });
+
+  const chartData = {
+    labels: ['Pending', 'Confirmed', 'Completed', 'Cancelled'],
+    datasets: [{
+      data: [statusCounts.PENDING, statusCounts.CONFIRMED, statusCounts.COMPLETED, statusCounts.CANCELLED],
+      backgroundColor: ['#ffc107', '#28a745', '#6c757d', '#dc3545'],
+    }],
+  };
+
   return (
     <div style={{minHeight: '100vh', background: '#f0f2f5'}}>
       <nav className='navbar navbar-dark' style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
@@ -82,6 +147,17 @@ function AdminDashboard() {
         </div>
       </nav>
       <div className='container mt-4'>
+        {allAppointments.length > 0 && (
+          <div className='row mb-4'>
+            <div className='col-md-4'>
+              <div className='card shadow p-3' style={{borderRadius: '15px'}}>
+                <h6 className='fw-bold text-center mb-3'>Appointments by Status</h6>
+                <Pie data={chartData} />
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className='row mb-5'>
           <div className='col-md-4'>
             <h5 className='fw-bold mb-3'>Hospitals</h5>
@@ -144,7 +220,29 @@ function AdminDashboard() {
 
         <div className='row mt-4'>
           <div className='col-md-4'>
-            <h5 className='fw-bold mb-3'>Doctors</h5>
+            <div className='d-flex justify-content-between align-items-center mb-3'>
+              <h5 className='fw-bold mb-0'>Doctors</h5>
+              <button className='btn btn-sm btn-primary' onClick={() => setShowAddDoctor(!showAddDoctor)}>
+                {showAddDoctor ? 'Cancel' : '+ Add Doctor'}
+              </button>
+            </div>
+
+            {showAddDoctor && (
+              <div className='card shadow p-3 mb-3' style={{borderRadius: '10px'}}>
+                {addDoctorMsg && <div className='alert alert-info py-1 px-2 small'>{addDoctorMsg}</div>}
+                <form onSubmit={handleAddDoctor}>
+                  <input className='form-control form-control-sm mb-2' name='name' placeholder='Full Name' value={doctorForm.name} onChange={handleDoctorFormChange} required />
+                  <input className='form-control form-control-sm mb-2' name='email' type='email' placeholder='Email' value={doctorForm.email} onChange={handleDoctorFormChange} required />
+                  <input className='form-control form-control-sm mb-2' name='phone' placeholder='Phone' value={doctorForm.phone} onChange={handleDoctorFormChange} />
+                  <input className='form-control form-control-sm mb-2' name='specialization' placeholder='Specialization' value={doctorForm.specialization} onChange={handleDoctorFormChange} required />
+                  <input className='form-control form-control-sm mb-2' name='qualification' placeholder='Qualification' value={doctorForm.qualification} onChange={handleDoctorFormChange} />
+                  <input className='form-control form-control-sm mb-2' name='experienceYears' type='number' placeholder='Experience (years)' value={doctorForm.experienceYears} onChange={handleDoctorFormChange} />
+                  <input className='form-control form-control-sm mb-2' name='password' type='password' placeholder='Password' value={doctorForm.password} onChange={handleDoctorFormChange} required />
+                  <button type='submit' className='btn btn-success btn-sm w-100'>Register Doctor</button>
+                </form>
+              </div>
+            )}
+
             {doctors.length === 0 ? (
               <p className='text-muted'>No doctors registered yet.</p>
             ) : (

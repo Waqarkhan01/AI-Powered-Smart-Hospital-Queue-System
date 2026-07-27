@@ -4,10 +4,12 @@ import com.hospital.entity.Admission;
 import com.hospital.entity.Bed;
 import com.hospital.entity.Bed.BedStatus;
 import com.hospital.entity.Hospital;
+import com.hospital.entity.Notification;
 import com.hospital.entity.Patient;
 import com.hospital.repository.AdmissionRepository;
 import com.hospital.repository.BedRepository;
 import com.hospital.repository.HospitalRepository;
+import com.hospital.repository.NotificationRepository;
 import com.hospital.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,9 @@ public class AdmissionController {
 
     @Autowired
     private BedRepository bedRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     @PostMapping
     public ResponseEntity<?> admitPatient(@RequestParam Long patientId,
@@ -89,6 +94,19 @@ public class AdmissionController {
             bedRepository.save(bed);
         }
 
-        return ResponseEntity.ok(admissionRepository.save(admission));
+        Admission saved = admissionRepository.save(admission);
+
+        createNotification(admission.getPatient(), "You have been released from " + admission.getHospital().getName() + ". We wish you good health!");
+
+        return ResponseEntity.ok(saved);
+    }
+
+    private void createNotification(Patient patient, String message) {
+        Notification notification = new Notification();
+        notification.setPatient(patient);
+        notification.setMessage(message);
+        notification.setType("APP");
+        notification.setSent(true);
+        notificationRepository.save(notification);
     }
 }

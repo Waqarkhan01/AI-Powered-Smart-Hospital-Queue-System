@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { appointmentService } from '../services/api';
 
 function MyAppointments() {
@@ -20,11 +21,13 @@ function MyAppointments() {
   }, []);
 
   const handleCancel = async (id) => {
+    if (!window.confirm('Are you sure you want to cancel this appointment?')) return;
     try {
-      await appointmentService.cancel(id);
-      setAppointments(appointments.filter(a => a.id !== id));
+      await appointmentService.updateStatus(id, 'CANCELLED');
+      setAppointments(appointments.map(a => a.id === id ? { ...a, status: 'CANCELLED' } : a));
+      toast.success('Appointment cancelled successfully!');
     } catch (err) {
-      alert('Failed to cancel appointment.');
+      toast.error('Failed to cancel appointment.');
     }
   };
 
@@ -49,7 +52,9 @@ function MyAppointments() {
 
       <div className='container mt-4'>
         {loading ? (
-          <p>Loading appointments...</p>
+          <div className='text-center mt-5'>
+            <div className='spinner-border text-primary' role='status'></div>
+          </div>
         ) : appointments.length === 0 ? (
           <p className='text-muted'>No appointments yet. Book one from the Doctors page.</p>
         ) : (

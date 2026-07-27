@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { doctorService, appointmentService } from '../services/api';
 
 function DoctorsList() {
@@ -7,7 +8,6 @@ function DoctorsList() {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [bookingId, setBookingId] = useState(null);
-  const [message, setMessage] = useState('');
 
   useEffect(() => {
     doctorService.getAll()
@@ -19,7 +19,7 @@ function DoctorsList() {
   const handleBook = async (doctorId) => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!user || !user.id) {
-      setMessage('Please log in again.');
+      toast.error('Please log in again.');
       return;
     }
     setBookingId(doctorId);
@@ -29,9 +29,9 @@ function DoctorsList() {
         appointmentTime: '10:00:00',
         reason: 'General consultation'
       });
-      setMessage('Appointment requested successfully!');
+      toast.success('Appointment requested successfully!');
     } catch (err) {
-      setMessage('Failed to book appointment.');
+      toast.error('Failed to book appointment.');
     } finally {
       setBookingId(null);
     }
@@ -47,10 +47,10 @@ function DoctorsList() {
       </nav>
 
       <div className='container mt-4'>
-        {message && <div className='alert alert-info'>{message}</div>}
-
         {loading ? (
-          <p>Loading doctors...</p>
+          <div className='text-center mt-5'>
+            <div className='spinner-border text-primary' role='status'></div>
+          </div>
         ) : doctors.length === 0 ? (
           <p className='text-muted'>No doctors available yet.</p>
         ) : (

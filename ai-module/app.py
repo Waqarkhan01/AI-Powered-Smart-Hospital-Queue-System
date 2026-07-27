@@ -7,6 +7,7 @@ app = Flask(__name__)
 CORS(app)
 
 model = joblib.load('priority_model.pkl')
+waittime_model = joblib.load('waittime_model.pkl')
 
 priority_labels = {0: 'LOW', 1: 'MEDIUM', 2: 'HIGH', 3: 'CRITICAL'}
 
@@ -44,10 +45,19 @@ def predict_waittime():
         data = request.get_json()
         queue_count = data.get('queueCount', 0)
         priority_code = data.get('priorityCode', 1)
-        base_time = queue_count * 15
-        if priority_code == 3: base_time = max(5, base_time - 30)
-        elif priority_code == 2: base_time = max(10, base_time - 15)
-        return jsonify({'estimatedWaitTime': base_time, 'unit': 'minutes'})
+        hour_of_day = data.get('hourOfDay', 12)
+        occupancy_rate = data.get('occupancyRate', 0.5)
+        doctors_available = data.get('doctorsAvailable', 3)
+
+        features = np.array([[
+            queue_count,
+            priority_code,
+            hour_of_day,
+            occupancy_rate,
+            doctors_available
+        ]])
+        prediction = waittime_model.predict(features)[0]
+        return jsonify({'estimatedWaitTime': round(float(prediction)), 'unit': 'minutes'})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 

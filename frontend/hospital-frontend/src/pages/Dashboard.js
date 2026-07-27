@@ -134,6 +134,17 @@ function Dashboard() {
               </div>
             </Link>
           </div>
+          <div className='col-md-6 mb-3'>
+            <Link to='/notifications' className='text-decoration-none'>
+              <div className='card shadow p-4 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s'}}
+                onMouseEnter={e => e.currentTarget.style.transform='scale(1.02)'}
+                onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}>
+                <div style={{fontSize: '40px', marginBottom: '10px'}}>&#128276;</div>
+                <h5 className='fw-bold text-danger'>Notifications</h5>
+                <p className='text-muted mb-0'>View your alerts and updates</p>
+              </div>
+            </Link>
+          </div>
         </div>
         {hospitals.length > 0 && (
           <div className='mt-4'>

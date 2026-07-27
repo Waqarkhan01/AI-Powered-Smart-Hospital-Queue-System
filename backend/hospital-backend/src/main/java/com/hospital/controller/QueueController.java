@@ -32,6 +32,9 @@ public class QueueController {
     @Autowired
     private AdmissionRepository admissionRepository;
 
+    @Autowired
+    private NotificationRepository notificationRepository;
+
     @PostMapping("/join")
     public ResponseEntity<?> joinQueue(@RequestParam Long patientId,
                                         @RequestParam Long hospitalId,
@@ -55,7 +58,11 @@ public class QueueController {
         queue.setQueuePosition((int) position);
         queue.setEstimatedWaitTime((int) position * 15);
 
-        return ResponseEntity.ok(queueRepository.save(queue));
+        Queue saved = queueRepository.save(queue);
+
+        createNotification(patient, "You joined the queue at " + hospital.getName() + ". Position: " + position);
+
+        return ResponseEntity.ok(saved);
     }
 
     @GetMapping("/patient/{patientId}")
@@ -102,6 +109,8 @@ public class QueueController {
         entry.setAdmittedAt(LocalDateTime.now());
         queueRepository.save(entry);
 
+        createNotification(entry.getPatient(), "You have been admitted to " + entry.getHospital().getName() + ", Bed: " + availableBed.getBedNumber() + ".");
+
         return ResponseEntity.ok(admission);
     }
 
@@ -112,5 +121,14 @@ public class QueueController {
         }
         queueRepository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private void createNotification(Patient patient, String message) {
+        Notification notification = new Notification();
+        notification.setPatient(patient);
+        notification.setMessage(message);
+        notification.setType("APP");
+        notification.setSent(true);
+        notificationRepository.save(notification);
     }
 }
