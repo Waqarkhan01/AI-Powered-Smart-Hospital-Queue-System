@@ -57,91 +57,91 @@ function Dashboard() {
         </div>
         <h5 className='fw-bold mb-3 text-secondary'>Quick Actions</h5>
         <div className='row'>
-          <div className='col-md-6 mb-3'>
+          <div className='col-md-4 mb-3'>
             <Link to='/hospitals' className='text-decoration-none'>
-              <div className='card shadow p-4 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s'}}
+              <div className='card shadow p-3 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s'}}
                 onMouseEnter={e => e.currentTarget.style.transform='scale(1.02)'}
                 onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}>
-                <div style={{fontSize: '40px', marginBottom: '10px'}}>&#128968;</div>
-                <h5 className='fw-bold text-primary'>Search Hospitals</h5>
-                <p className='text-muted mb-0'>Find hospitals and check bed availability</p>
+                <div style={{fontSize: '35px', marginBottom: '8px'}}>&#128968;</div>
+                <h6 className='fw-bold text-primary'>Search Hospitals</h6>
+                <p className='text-muted mb-0 small'>Find hospitals and beds</p>
               </div>
             </Link>
           </div>
-          <div className='col-md-6 mb-3'>
+          <div className='col-md-4 mb-3'>
             <Link to='/queue' className='text-decoration-none'>
-              <div className='card shadow p-4 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s'}}
+              <div className='card shadow p-3 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s'}}
                 onMouseEnter={e => e.currentTarget.style.transform='scale(1.02)'}
                 onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}>
-                <div style={{fontSize: '40px', marginBottom: '10px'}}>&#128203;</div>
-                <h5 className='fw-bold text-success'>My Queue Status</h5>
-                <p className='text-muted mb-0'>View your queue position and waiting time</p>
+                <div style={{fontSize: '35px', marginBottom: '8px'}}>&#128203;</div>
+                <h6 className='fw-bold text-success'>My Queue Status</h6>
+                <p className='text-muted mb-0 small'>View queue position</p>
               </div>
             </Link>
           </div>
-          <div className='col-md-6 mb-3'>
-            <Link to='/admin' className='text-decoration-none'>
-              <div className='card shadow p-4 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s'}}
-                onMouseEnter={e => e.currentTarget.style.transform='scale(1.02)'}
-                onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}>
-                <div style={{fontSize: '40px', marginBottom: '10px'}}>&#9881;</div>
-                <h5 className='fw-bold text-warning'>Admin Panel</h5>
-                <p className='text-muted mb-0'>Manage hospitals, beds and queues</p>
-              </div>
-            </Link>
-          </div>
-          <div className='col-md-6 mb-3'>
+          <div className='col-md-4 mb-3'>
             <Link to='/ai-prediction' className='text-decoration-none'>
-              <div className='card shadow p-4 text-center' style={{borderRadius: '15px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', cursor: 'pointer', transition: 'transform 0.2s'}}
+              <div className='card shadow p-3 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}
                 onMouseEnter={e => e.currentTarget.style.transform='scale(1.02)'}
                 onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}>
-                <div style={{fontSize: '40px', marginBottom: '10px'}}>&#129302;</div>
-                <h5 className='fw-bold text-white'>AI Prediction</h5>
-                <p className='text-white mb-0' style={{opacity: 0.8}}>Smart priority and wait time prediction</p>
+                <div style={{fontSize: '35px', marginBottom: '8px'}}>&#129302;</div>
+                <h6 className='fw-bold text-white'>AI Priority</h6>
+                <p className='text-white mb-0 small' style={{opacity: 0.8}}>Get AI prediction</p>
               </div>
             </Link>
           </div>
-          <div className='col-md-6 mb-3'>
+          <div className='col-md-4 mb-3'>
             <Link to='/doctors' className='text-decoration-none'>
-              <div className='card shadow p-4 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s'}}
+              <div className='card shadow p-3 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s'}}
                 onMouseEnter={e => e.currentTarget.style.transform='scale(1.02)'}
                 onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}>
-                <div style={{fontSize: '40px', marginBottom: '10px'}}>&#128104;&#8205;&#9877;&#65039;</div>
-                <h5 className='fw-bold text-info'>Find a Doctor</h5>
-                <p className='text-muted mb-0'>Browse doctors and book an appointment</p>
+                <div style={{fontSize: '35px', marginBottom: '8px'}}>&#128105;&#8205;&#9877;&#65039;</div>
+                <h6 className='fw-bold text-info'>Find Doctors</h6>
+                <p className='text-muted mb-0 small'>Book appointments</p>
               </div>
             </Link>
           </div>
-          <div className='col-md-6 mb-3'>
+          <div className='col-md-4 mb-3'>
             <Link to='/my-appointments' className='text-decoration-none'>
-              <div className='card shadow p-4 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s'}}
+              <div className='card shadow p-3 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s'}}
                 onMouseEnter={e => e.currentTarget.style.transform='scale(1.02)'}
                 onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}>
-                <div style={{fontSize: '40px', marginBottom: '10px'}}>&#128197;</div>
-                <h5 className='fw-bold text-primary'>My Appointments</h5>
-                <p className='text-muted mb-0'>View and manage your booked appointments</p>
+                <div style={{fontSize: '35px', marginBottom: '8px'}}>&#128197;</div>
+                <h6 className='fw-bold text-warning'>My Appointments</h6>
+                <p className='text-muted mb-0 small'>View and manage</p>
               </div>
             </Link>
           </div>
-          <div className='col-md-6 mb-3'>
+          <div className='col-md-4 mb-3'>
             <Link to='/my-admissions' className='text-decoration-none'>
-              <div className='card shadow p-4 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s'}}
+              <div className='card shadow p-3 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s'}}
                 onMouseEnter={e => e.currentTarget.style.transform='scale(1.02)'}
                 onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}>
-                <div style={{fontSize: '40px', marginBottom: '10px'}}>&#127973;</div>
-                <h5 className='fw-bold text-success'>My Admissions</h5>
-                <p className='text-muted mb-0'>View your hospital admission history</p>
+                <div style={{fontSize: '35px', marginBottom: '8px'}}>&#127973;</div>
+                <h6 className='fw-bold text-danger'>My Admissions</h6>
+                <p className='text-muted mb-0 small'>View hospital admissions</p>
               </div>
             </Link>
           </div>
-          <div className='col-md-6 mb-3'>
+          <div className='col-md-4 mb-3'>
             <Link to='/notifications' className='text-decoration-none'>
-              <div className='card shadow p-4 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s'}}
+              <div className='card shadow p-3 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s'}}
                 onMouseEnter={e => e.currentTarget.style.transform='scale(1.02)'}
                 onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}>
-                <div style={{fontSize: '40px', marginBottom: '10px'}}>&#128276;</div>
-                <h5 className='fw-bold text-danger'>Notifications</h5>
-                <p className='text-muted mb-0'>View your alerts and updates</p>
+                <div style={{fontSize: '35px', marginBottom: '8px'}}>&#128276;</div>
+                <h6 className='fw-bold text-primary'>Notifications</h6>
+                <p className='text-muted mb-0 small'>View your alerts</p>
+              </div>
+            </Link>
+          </div>
+          <div className='col-md-4 mb-3'>
+            <Link to='/disease-risk' className='text-decoration-none'>
+              <div className='card shadow p-3 text-center' style={{borderRadius: '15px', cursor: 'pointer', transition: 'transform 0.2s'}}
+                onMouseEnter={e => e.currentTarget.style.transform='scale(1.02)'}
+                onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}>
+                <div style={{fontSize: '35px', marginBottom: '8px'}}>&#129502;</div>
+                <h6 className='fw-bold text-danger'>Health Risk Check</h6>
+                <p className='text-muted mb-0 small'>Check diabetes and heart disease risk</p>
               </div>
             </Link>
           </div>

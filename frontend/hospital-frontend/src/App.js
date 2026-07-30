@@ -13,6 +13,9 @@ import AIPrediction from './pages/AIPrediction';
 import DoctorsList from './pages/DoctorsList';
 import MyAppointments from './pages/MyAppointments';
 import DoctorDashboard from './pages/DoctorDashboard';
+import MyAdmissions from './pages/MyAdmissions';
+import Notifications from './pages/Notifications';
+import DiseaseRisk from './pages/DiseaseRisk';
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -34,6 +37,9 @@ function App() {
         <Route path='/doctors' element={<PrivateRoute><DoctorsList /></PrivateRoute>} />
         <Route path='/my-appointments' element={<PrivateRoute><MyAppointments /></PrivateRoute>} />
         <Route path='/doctor-dashboard' element={<PrivateRoute><DoctorDashboard /></PrivateRoute>} />
+        <Route path='/my-admissions' element={<PrivateRoute><MyAdmissions /></PrivateRoute>} />
+        <Route path='/notifications' element={<PrivateRoute><Notifications /></PrivateRoute>} />
+        <Route path='/disease-risk' element={<PrivateRoute><DiseaseRisk /></PrivateRoute>} />
         <Route path='/' element={<Navigate to='/login' />} />
       </Routes>
     </Router>

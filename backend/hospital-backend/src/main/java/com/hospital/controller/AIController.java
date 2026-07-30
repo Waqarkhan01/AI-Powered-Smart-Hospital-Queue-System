@@ -18,14 +18,38 @@ public class AIController {
 
     @PostMapping("/predict/priority")
     public ResponseEntity<?> predictPriority(@RequestBody Map<String, Object> vitals) {
+        return callFlask("/predict/priority", vitals);
+    }
+
+    @PostMapping("/predict/waittime")
+    public ResponseEntity<?> predictWaitTime(@RequestBody Map<String, Object> data) {
+        return callFlask("/predict/waittime", data);
+    }
+
+    @PostMapping("/predict/bedavailability")
+    public ResponseEntity<?> predictBedAvailability(@RequestBody Map<String, Object> data) {
+        return callFlask("/predict/bedavailability", data);
+    }
+
+    @PostMapping("/predict/diseaserisk")
+    public ResponseEntity<?> predictDiseaseRisk(@RequestBody Map<String, Object> data) {
+        return callFlask("/predict/diseaserisk", data);
+    }
+
+    @PostMapping("/recommend/hospital")
+    public ResponseEntity<?> recommendHospital(@RequestBody Map<String, Object> data) {
+        return callFlask("/recommend/hospital", data);
+    }
+
+    private ResponseEntity<?> callFlask(String path, Map<String, Object> body) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            HttpEntity<Map<String, Object>> request = new HttpEntity<>(vitals, headers);
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
             ResponseEntity<Map> response = restTemplate.postForEntity(
-                    FLASK_BASE_URL + "/predict/priority",
+                    FLASK_BASE_URL + path,
                     request,
                     Map.class
             );

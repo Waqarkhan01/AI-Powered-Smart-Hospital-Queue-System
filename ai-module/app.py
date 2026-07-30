@@ -8,6 +8,9 @@ CORS(app)
 
 model = joblib.load('priority_model.pkl')
 waittime_model = joblib.load('waittime_model.pkl')
+bedavailability_model = joblib.load('bedavailability_model.pkl')
+diabetes_model = joblib.load('diabetes_risk_model.pkl')
+heart_model = joblib.load('heart_risk_model.pkl')
 
 priority_labels = {0: 'LOW', 1: 'MEDIUM', 2: 'HIGH', 3: 'CRITICAL'}
 
@@ -58,6 +61,51 @@ def predict_waittime():
         ]])
         prediction = waittime_model.predict(features)[0]
         return jsonify({'estimatedWaitTime': round(float(prediction)), 'unit': 'minutes'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/predict/bedavailability', methods=['POST'])
+def predict_bedavailability():
+    try:
+        data = request.get_json()
+        bed_type_map = {'GENERAL': 0, 'ICU': 1, 'EMERGENCY': 2, 'VENTILATOR': 3}
+        bed_type = bed_type_map.get(data.get('bedType', 'GENERAL'), 0)
+        occupancy_rate = data.get('occupancyRate', 0.5)
+        total_beds = data.get('totalBeds', 20)
+        queue_count_for_type = data.get('queueCountForType', 0)
+        hour_of_day = data.get('hourOfDay', 12)
+
+        features = np.array([[
+            bed_type,
+            occupancy_rate,
+            total_beds,
+            queue_count_for_type,
+            hour_of_day
+        ]])
+        prediction = bedavailability_model.predict(features)[0]
+        return jsonify({'estimatedWaitForBed': round(float(prediction)), 'unit': 'minutes'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/predict/diseaserisk', methods=['POST'])
+def predict_diseaserisk():
+    try:
+        data = request.get_json()
+        features = np.array([[
+            data['age'],
+            data['bmi'],
+            data['glucose'],
+            data['bloodPressure'],
+            data['cholesterol'],
+            data['smoking'],
+            data['familyHistory']
+        ]])
+        diabetes_proba = diabetes_model.predict_proba(features)[0][1]
+        heart_proba = heart_model.predict_proba(features)[0][1]
+        return jsonify({
+            'diabetesRisk': round(float(diabetes_proba) * 100, 1),
+            'heartDiseaseRisk': round(float(heart_proba) * 100, 1)
+        })
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 

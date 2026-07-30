@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { toast } from 'react-toastify';
+import { hospitalService, queueService, bedService } from '../services/api';
 
 function AIPrediction() {
   const navigate = useNavigate();
@@ -11,6 +13,19 @@ function AIPrediction() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const [hospitals, setHospitals] = useState([]);
+  const [selectedHospitalId, setSelectedHospitalId] = useState('');
+  const [waitTime, setWaitTime] = useState(null);
+  const [waitLoading, setWaitLoading] = useState(false);
+  const [waitError, setWaitError] = useState('');
+
+  const [recommendations, setRecommendations] = useState([]);
+  const [recLoading, setRecLoading] = useState(false);
+
+  useEffect(() => {
+    hospitalService.getAll().then(res => setHospitals(res.data)).catch(console.error);
+  }, []);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -18,6 +33,9 @@ function AIPrediction() {
   const handlePredict = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setWaitTime(null);
+    setSelectedHospitalId('');
+    setRecommendations([]);
     try {
       const response = await api.post('/ai/predict/priority', {
         age: parseInt(form.age),
@@ -30,10 +48,82 @@ function AIPrediction() {
         emergency: parseInt(form.emergency)
       });
       setResult(response.data);
+      loadRecommendations(response.data.priorityCode);
     } catch (err) {
-      alert('Prediction failed. Make sure AI server is running.');
+      toast.error('Prediction failed. Make sure AI server is running.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadRecommendations = async (priorityCode) => {
+    setRecLoading(true);
+    try {
+      const allHospitals = await hospitalService.getAll();
+      const hospitalList = allHospitals.data;
+
+      const enriched = await Promise.all(hospitalList.map(async (h) => {
+        try {
+          const [queueRes, bedsRes] = await Promise.all([
+            queueService.getHospitalQueue(h.id),
+            bedService.getAvailable(h.id)
+          ]);
+          return {
+            id: h.id,
+            name: h.name,
+            city: h.city,
+            rating: h.rating,
+            waitTime: queueRes.data.length * 15,
+            availableBeds: bedsRes.data.length
+          };
+        } catch (err) {
+          return { id: h.id, name: h.name, city: h.city, rating: h.rating, waitTime: 0, availableBeds: 0 };
+        }
+      }));
+
+      const res = await api.post('/ai/recommend/hospital', {
+        hospitals: enriched,
+        priorityCode
+      });
+      setRecommendations(res.data.recommendations.slice(0, 3));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setRecLoading(false);
+    }
+  };
+
+  const handleHospitalSelect = async (hospitalId) => {
+    setSelectedHospitalId(hospitalId);
+    setWaitTime(null);
+    setWaitError('');
+    if (!hospitalId || !result) return;
+
+    setWaitLoading(true);
+    try {
+      const [queueRes, bedsRes] = await Promise.all([
+        queueService.getHospitalQueue(hospitalId),
+        bedService.getByHospital(hospitalId)
+      ]);
+
+      const queueCount = queueRes.data.length;
+      const beds = bedsRes.data;
+      const occupiedCount = beds.filter(b => b.status === 'OCCUPIED').length;
+      const occupancyRate = beds.length > 0 ? occupiedCount / beds.length : 0.5;
+      const hourOfDay = new Date().getHours();
+
+      const waitRes = await api.post('/ai/predict/waittime', {
+        queueCount,
+        priorityCode: result.priorityCode,
+        hourOfDay,
+        occupancyRate,
+        doctorsAvailable: 3
+      });
+      setWaitTime(waitRes.data.estimatedWaitTime);
+    } catch (err) {
+      setWaitError('Could not estimate wait time.');
+    } finally {
+      setWaitLoading(false);
     }
   };
 
@@ -83,7 +173,7 @@ function AIPrediction() {
                   </div>
                   <div className='col-md-6 mb-3'>
                     <label className='form-label fw-bold'>Heart Rate (bpm)</label>
-                    <input type='number' className='form-control' name='heartRate' value={form.heartRate} onChange={handleChange} placeholder='e.g. 85' required />
+                    <input type='number' className='form-control' name='heartRate' value={form.heartRate} onChange={handleChange}placeholder='e.g. 85' required />
                   </div>
                   <div className='col-md-6 mb-3'>
                     <label className='form-label fw-bold'>Blood Pressure</label>
@@ -120,7 +210,7 @@ function AIPrediction() {
             {result ? (
               <div className='card shadow p-4 text-center' style={{borderRadius: '15px'}}>
                 <h5 className='fw-bold mb-4'>AI Prediction Result</h5>
-                <div style={{width: '150px', height: '150px', borderRadius: '50%', background: getPriorityColor(result.priority), margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                <div style={{width: '150px', height: '150px', borderRadius: '50%', background: getPriorityColor(result.priority),margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                   <div>
                     <div style={{color: 'white', fontSize: '18px', fontWeight: 'bold'}}>{result.priority}</div>
                     <div style={{color: 'white', fontSize: '12px'}}>Priority</div>
@@ -137,6 +227,42 @@ function AIPrediction() {
                   {result.priority === 'MEDIUM' && 'Moderate urgency. Will be attended soon.'}
                   {result.priority === 'LOW' && 'Non-urgent case. Please wait for your turn.'}
                 </div>
+
+                <hr />
+                <h6 className='fw-bold mb-3'>Recommended Hospitals</h6>
+                {recLoading ? (
+                  <div className='spinner-border text-primary' style={{width: '2rem', height: '2rem'}}></div>
+                ) : (
+                  recommendations.map((h, idx) => (
+                    <div key={h.id} className='card shadow-sm mb-2 p-2 text-start' style={{borderRadius: '10px', borderLeft: idx === 0 ? '4px solid #28a745' : '4px solid #ddd'}}>
+                      <div className='d-flex justify-content-between align-items-center'>
+                        <div>
+                          <strong>{h.name}</strong>
+                          <div className='small text-muted'>{h.city} - Rating {h.rating} - {h.availableBeds} beds free</div>
+                        </div>
+                        {idx === 0 && <span className='badge bg-success'>Best Match</span>}
+                      </div>
+                    </div>
+                  ))
+                )}
+
+                <hr />
+                <h6 className='fw-bold mb-3'>Estimate Wait Time at a Hospital</h6>
+                <select className='form-control mb-3' value={selectedHospitalId} onChange={(e) => handleHospitalSelect(e.target.value)}>
+                  <option value=''>-- Select a hospital --</option>
+                  {hospitals.map(h => (
+                    <option key={h.id} value={h.id}>{h.name} ({h.city})</option>
+                  ))}
+                </select>
+
+                {waitLoading && <div className='spinner-border text-primary' style={{width: '2rem', height: '2rem'}}></div>}
+                {waitError && <p className='text-danger small'>{waitError}</p>}
+                {waitTime !== null && !waitLoading && (
+                  <div className='alert alert-info'>
+                    Estimated wait time: <strong>{waitTime} minutes</strong>
+                  </div>
+                )}
+
                 <button className='btn btn-outline-primary mt-2' onClick={() => navigate('/hospitals')}>Find Hospital</button>
               </div>
             ) : (
@@ -156,3 +282,4 @@ function AIPrediction() {
 }
 
 export default AIPrediction;
+
